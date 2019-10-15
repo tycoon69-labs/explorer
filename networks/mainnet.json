@@ -1,6 +1,6 @@
 {
   "title": "tycoon Mainnet Explorer",
-  "server": "http://0.0.0.0:4003/api/v2",
+  "server": "http://explorer.tycoonchain.com/api",
   "alias": "Main",
   "activeDelegates": "53",
   "rewardOffset": "1",
