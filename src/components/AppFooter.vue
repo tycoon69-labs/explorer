@@ -13,11 +13,11 @@
         >
       </div>
     </div>
-    <div class="text-center">
+    <!--<div class="text-center">
       <a v-for="social in socialMediaData" :key="social.name" :href="social.url" target="_blank">
         <SvgIcon class="m-1" :name="`social/${social.name}`" :view-box="social.viewBox" />
       </a>
-    </div>
+    </div>-->
   </footer>
 </template>
 
@@ -37,7 +37,7 @@ export default class AppFooter extends Vue {
   }
 
   get versionLink() {
-    return `https://github.com/ArkEcosystem/explorer/commit/${process.env.VUE_APP_GIT_VERSION}`;
+    return `https://github.com/tycoon69-labs/explorer/commit/${process.env.VUE_APP_GIT_VERSION}`;
   }
 
   get date() {

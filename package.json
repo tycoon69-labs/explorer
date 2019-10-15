@@ -84,7 +84,7 @@
     "vue-template-compiler": "^2.6.10"
   },
   "bugs": {
-    "url": "https://github.com/arkecosystem/explorer/issues"
+    "url": "https://github.com/tycoon69-labs/explorer/issues"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
@@ -102,6 +102,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arkecosystem/explorer.git"
+    "url": "git+https://github.com/tycoon69-labs/explorer.git"
   }
 }
