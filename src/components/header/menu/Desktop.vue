@@ -20,7 +20,7 @@
       {{ $t("PAGES.TOP_WALLETS.TITLE") }}
     </RouterLink>
 
-    <RouterLink :to="{ name: 'delegate-monitor' }" tag="button" class="menu-button" @click.native="closeMenu">
+    <RouterLink :to="{ name: 'leader-monitor' }" tag="button" class="menu-button" @click.native="closeMenu">
       {{ $t("PAGES.DELEGATE_MONITOR.TITLE") }}
     </RouterLink>
 

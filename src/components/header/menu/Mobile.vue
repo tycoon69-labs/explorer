@@ -19,7 +19,7 @@
       </RouterLink>
     </li>
     <li :class="[nightMode ? 'hover:bg-grey-dark' : 'hover:bg-grey-light', 'flex justify-center']">
-      <RouterLink :to="{ name: 'delegate-monitor' }" tag="div" class="cursor-pointer py-5 w-64 flex-none">
+      <RouterLink :to="{ name: 'leader-monitor' }" tag="div" class="cursor-pointer py-5 w-64 flex-none">
         {{ $t("PAGES.DELEGATE_MONITOR.TITLE") }}
       </RouterLink>
     </li>
