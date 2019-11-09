@@ -144,10 +144,10 @@ const router = new Router({
       meta: { title: (route: Route) => getTitle("Transactions") },
     },
     {
-      path: "/delegate-monitor",
-      name: "delegate-monitor",
+      path: "/leader-monitor",
+      name: "leader-monitor",
       component: DelegateMonitorComponent,
-      meta: { title: (route: Route) => getTitle("Delegate Monitor") },
+      meta: { title: (route: Route) => getTitle("Leader Monitor") },
     },
     {
       path: "/top-wallets",
