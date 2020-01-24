@@ -6,7 +6,7 @@
     <SvgIcon class="md:mr-2 flex-none text-link-color" :name="`currencies/${currencyName}`" view-box="0 0 22 16" />
     <span class="whitespace-no-wrap text-theme-text-content hidden md:inline-block">
       <!-- {{ networkToken() }}/{{ currencyName }}: {{ rawCurrency(currencyRate, currencyName) }} -->
-      {{ networkToken() }}/USD: 0.1569
+      {{ networkToken() }}/USD: 0.2169
     </span>
   </button>
 </template>
