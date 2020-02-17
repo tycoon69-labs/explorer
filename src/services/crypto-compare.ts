@@ -41,10 +41,16 @@ class CryptoCompareService {
   }
 
   public async price(currency: string): Promise<number | undefined> {
-    const response = await this.get(`https://min-api.cryptocompare.com/data/price?fsym=ARK&tsyms=${currency}`);
-    if (response.data[currency]) {
-      return Number(response.data[currency]);
+    const response = await this.get("https://emirex.com/api/v1/ticker?filter=t69");
+
+    if (response.data[`T69${currency}`]) {
+      return Number(response.data[`T69${currency}`].last);
     }
+
+    // const response = await this.get(`https://min-api.cryptocompare.com/data/price?fsym=ARK&tsyms=${currency}`);
+    // if (response.data[currency]) {
+    //   return Number(response.data[currency]);
+    // }
   }
 
   public async day(): Promise<{ datasets: any; labels: any }> {
@@ -75,7 +81,7 @@ class CryptoCompareService {
     const date = Math.round(new Date().getTime() / 1000);
     const token = store.getters["network/token"];
 
-    let targetCurrency = "USD";
+    let targetCurrency = "USDT";
     if (store.getters["currency/name"] !== token) {
       targetCurrency = store.getters["currency/name"];
     }
@@ -123,19 +129,21 @@ class CryptoCompareService {
       return Number(cache[ts]);
     }
 
-    const response = await this.get("https://min-api.cryptocompare.com/data/dayAvg", {
-      params: {
-        fsym: token,
-        tsym: targetCurrency,
-        toTs: ts,
-      },
-    });
+    // const response = await this.get("https://min-api.cryptocompare.com/data/dayAvg", {
+    //   params: {
+    //     fsym: token,
+    //     tsym: targetCurrency,
+    //     toTs: ts,
+    //   },
+    // });
+
+    const response = await this.get("https://emirex.com/api/v1/ticker");
 
     if (response.data.Response === "Error") {
       return null;
     }
 
-    const rate = response.data[targetCurrency];
+    const rate = response.data[`T69${targetCurrency}`].last;
 
     store.dispatch("currency/setLastConversion", {
       to: targetCurrency,

@@ -5,11 +5,11 @@ import { ActionTree, GetterTree, Module, MutationTree } from "vuex";
 
 const namespaced = true;
 const state: ICurrencyState = {
-  name: "ARK",
+  name: "USDT",
   rate: 1,
-  symbol: "Ѧ",
+  symbol: "$",
   lastConversion: {
-    to: "USD",
+    to: "USDT",
     timestamp: 1,
     rate: 1,
   },
