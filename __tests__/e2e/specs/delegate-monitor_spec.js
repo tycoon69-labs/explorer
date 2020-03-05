@@ -1,7 +1,7 @@
 describe("Delegate Monitor", () => {
   describe("Active Delegates", () => {
     beforeEach(() => {
-      cy.visit("/leader-monitor");
+      cy.visit("/delegate-monitor");
     });
 
     it("should display delegate details", () => {
@@ -180,7 +180,7 @@ describe("Delegate Monitor", () => {
         .contains("Delegate Monitor")
         .should("exist");
 
-      cy.url().should("include", "/leader-monitor");
+      cy.url().should("include", "/delegate-monitor");
       cy.get("button.button-lg").click();
       cy.url().should("include", "delegates/");
     });
@@ -188,7 +188,7 @@ describe("Delegate Monitor", () => {
 
   describe("Standby Delegates", () => {
     beforeEach(() => {
-      cy.visit("/leader-monitor");
+      cy.visit("/delegate-monitor");
       cy.get(".inactive-tab")
         .contains("Standby")
         .click();
