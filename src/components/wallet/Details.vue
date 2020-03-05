@@ -18,6 +18,13 @@
             name="second-passphrase"
             view-box="0 0 14 14"
           />
+          <SvgIcon
+            v-if="wallet.multiSignature"
+            v-tooltip="$t('WALLET.MULTI_SIGNATURE_WALLET')"
+            class="ml-2"
+            name="multi-signature"
+            view-box="0 0 14 14"
+          />
           <span v-if="name" class="ml-2 text-white semibold">
             {{ name }}
           </span>
@@ -54,19 +61,30 @@
           {{ $t("WALLET.BALANCE", { token: networkToken() }) }}
         </div>
         <div class="text-lg text-white semibold">
-          <span v-tooltip="readableCurrency(wallet.balance)">
+          <span v-tooltip="showBalanceTooltip ? readableCurrency(wallet.balance) : ''">
             {{ readableCrypto(wallet.balance, false) }}
           </span>
         </div>
       </div>
 
-      <div v-show="isVoting" v-if="view === 'public'" class="flex-none border-r border-grey-dark px-9">
-        <div class="text-grey mb-2">
-          {{ $t("WALLET.VOTING_FOR") }}
+      <div v-if="view === 'public' && hasLockedBalance" class="flex-none border-r border-grey-dark px-9">
+        <div class="flex items-center text-grey mb-2">
+          {{ $t("WALLET.LOCKED_BALANCE") }}
+          <SvgIcon class="ml-2" name="locked-balance" view-box="0 0 16 17" />
         </div>
-        <LinkWallet v-if="votedDelegate.address" :address="votedDelegate.address">
-          <span class="text-lg text-white semibold truncate">{{ votedDelegate.username }}</span>
-        </LinkWallet>
+        <span
+          v-tooltip="
+            showBalanceTooltip
+              ? {
+                  trigger: 'hover click',
+                  content: readableCurrency(wallet.lockedBalance || 0),
+                }
+              : ''
+          "
+          class="text-lg text-white semibold"
+        >
+          {{ readableCrypto(wallet.lockedBalance, false) }}
+        </span>
       </div>
 
       <div class="flex-none px-8">
@@ -90,21 +108,31 @@
     </div>
 
     <!-- Mobile -->
-    <div v-if="wallet.address" class="px-5 sm:px-10 py-10 bg-theme-feature-background md:hidden">
-      <div class="flex justify-center mb-10">
+    <div v-if="wallet.address" class="px-5 sm:px-10 py-10 bg-theme-feature-background md:hidden overflow-hidden">
+      <div class="flex justify-center mb-6">
         <div class="flex items-center p-2 bg-white rounded mx-auto">
           <QrCode :value="wallet.address" :options="{ size: 160 }" />
         </div>
       </div>
       <div class="px-2">
-        <div class="flex -mx-6 mb-8">
-          <div :class="{ 'border-r': wallet.publicKey }" class="md:w-1/2 px-6 w-full border-grey-dark">
+        <div class="flex flex-wrap -mx-6">
+          <div
+            :class="{ 'border-r border-grey-dark -mr-1': wallet.publicKey }"
+            class="md:w-1/2 px-6 flex-1 whitespace-no-wrap my-4"
+          >
             <div class="flex items-center text-grey mb-2">
               <span class="mr-2">{{ $t("WALLET.ADDRESS") }}</span>
               <SvgIcon
                 v-if="wallet.secondPublicKey"
                 v-tooltip="{ trigger: 'click', content: $t('WALLET.SECOND_PASSPHRASE_ENABLED') }"
                 name="second-passphrase"
+                view-box="0 0 14 14"
+              />
+              <SvgIcon
+                v-if="wallet.multiSignature"
+                v-tooltip="$t('WALLET.MULTI_SIGNATURE_WALLET')"
+                class="ml-2"
+                name="multi-signature"
                 view-box="0 0 14 14"
               />
             </div>
@@ -116,7 +144,7 @@
               <Clipboard v-if="wallet.address" :value="wallet.address" />
             </div>
           </div>
-          <div v-if="wallet.publicKey" class="md:w-1/2 px-6 w-full">
+          <div v-if="wallet.publicKey" class="md:w-1/2 px-6 flex-1 whitespace-no-wrap my-4">
             <div class="text-grey mb-2">
               {{ $t("WALLET.PUBLIC_KEY") }}
             </div>
@@ -126,8 +154,11 @@
             </div>
           </div>
         </div>
-        <div class="flex -mx-6">
-          <div :class="{ 'border-r border-grey-dark': isVoting }" class="md:w-1/2 px-6 w-full">
+        <div class="flex flex-wrap -mx-6">
+          <div
+            :class="{ 'border-r border-grey-dark -mr-1': hasLockedBalance }"
+            class="md:w-1/2 px-6 flex-1 whitespace-no-wrap my-4"
+          >
             <div class="text-grey mb-2">
               {{ $t("WALLET.BALANCE", { token: networkToken() }) }}
             </div>
@@ -143,13 +174,20 @@
             </div>
           </div>
 
-          <div v-show="isVoting" v-if="view === 'public'" class="md:w-1/2 px-6 w-full">
-            <div class="text-grey mb-2">
-              {{ $t("WALLET.VOTING_FOR") }}
+          <div v-if="view === 'public' && hasLockedBalance" class="md:w-1/2 px-6 flex-1 whitespace-no-wrap my-4">
+            <div class="flex items-center text-grey mb-2">
+              {{ $t("WALLET.LOCKED_BALANCE") }}
+              <SvgIcon class="ml-2" name="locked-balance" view-box="0 0 16 17" />
             </div>
-            <LinkWallet v-if="votedDelegate.address" :address="votedDelegate.address">
-              <span class="text-white semibold truncate">{{ votedDelegate.username }}</span>
-            </LinkWallet>
+            <span
+              v-tooltip="{
+                trigger: 'hover click',
+                content: readableCurrency(wallet.lockedBalance),
+              }"
+              class="text-white"
+            >
+              {{ readableCrypto(wallet.lockedBalance, false) }}
+            </span>
           </div>
         </div>
       </div>
@@ -181,15 +219,19 @@ import WalletVoters from "@/components/wallet/Voters.vue";
     WalletVoters,
   },
   computed: {
-    ...mapGetters("network", ["knownWallets"]),
+    ...mapGetters("network", ["isListed", "knownWallets", "token"]),
+    ...mapGetters("currency", { currencyName: "name" }),
   },
 })
 export default class WalletDetails extends Vue {
   @Prop({ required: true }) public wallet: IWallet;
 
-  private view: string = "public";
-  private showModal: boolean = false;
+  private view = "public";
+  private showModal = false;
   private knownWallets: { [key: string]: string };
+  private isListed: boolean;
+  private token: string;
+  private currencyName: string;
 
   get name() {
     return this.knownWallets[this.wallet.address];
@@ -205,6 +247,14 @@ export default class WalletDetails extends Vue {
 
   get isVoting() {
     return !!this.wallet.vote;
+  }
+
+  get hasLockedBalance() {
+    return !!this.wallet.lockedBalance;
+  }
+
+  get showBalanceTooltip() {
+    return this.isListed && this.token !== this.currencyName;
   }
 
   private setView(view: string) {

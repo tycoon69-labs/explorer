@@ -12,8 +12,27 @@ const transactionPropertyArray = [
   "recipient",
   "signature",
   "confirmations",
+  "nonce",
+  "typeGroup",
+  "version",
 ].sort();
 // Note: asset, recipientId, signSignature and vendorField can also be returned, but are optional
+
+const multiSigTransactionPropertyArray = [
+  "id",
+  "blockId",
+  "type",
+  "timestamp",
+  "amount",
+  "fee",
+  "sender",
+  "recipient",
+  "signatures",
+  "confirmations",
+  "nonce",
+  "typeGroup",
+  "version",
+].sort();
 
 describe("Services > Transaction", () => {
   beforeAll(() => {
@@ -24,7 +43,9 @@ describe("Services > Transaction", () => {
     const data = await TransactionService.latest();
     expect(data).toHaveLength(25);
     data.forEach(transaction => {
-      expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
+      transaction.signatures
+        ? expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(multiSigTransactionPropertyArray))
+        : expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
     });
     expect(data.sort((a, b) => a.timestamp.unix > b.timestamp.unix)).toEqual(data);
   });
@@ -53,7 +74,9 @@ describe("Services > Transaction", () => {
     const { data } = await TransactionService.allByAddress("AUexKjGtgsSpVzPLs6jNMM6vJ6znEVTQWK", 1);
     expect(data).toHaveLength(25);
     data.forEach(transaction => {
-      expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
+      transaction.signatures
+        ? expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(multiSigTransactionPropertyArray))
+        : expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
     });
     expect(data.sort((a, b) => a.timestamp.unix < b.timestamp.unix)).toEqual(data);
   });
@@ -62,7 +85,9 @@ describe("Services > Transaction", () => {
     const { data } = await TransactionService.allByAddress("AUexKjGtgsSpVzPLs6jNMM6vJ6znEVTQWK", 2, 40);
     expect(data).toHaveLength(40);
     data.forEach(transaction => {
-      expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
+      transaction.signatures
+        ? expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(multiSigTransactionPropertyArray))
+        : expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
     });
     expect(data.sort((a, b) => a.timestamp.unix < b.timestamp.unix)).toEqual(data);
   });
@@ -71,7 +96,9 @@ describe("Services > Transaction", () => {
     const { data } = await TransactionService.sentByAddress("AYCTHSZionfGoQsRnv5gECEuFWcZXS38gs");
     expect(data).toHaveLength(25);
     data.forEach(transaction => {
-      expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
+      transaction.signatures
+        ? expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(multiSigTransactionPropertyArray))
+        : expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
     });
     expect(data.sort((a, b) => a.timestamp.unix < b.timestamp.unix)).toEqual(data);
   });
@@ -80,7 +107,9 @@ describe("Services > Transaction", () => {
     const { data } = await TransactionService.sentByAddress("AYCTHSZionfGoQsRnv5gECEuFWcZXS38gs", 3, 40);
     expect(data).toHaveLength(40);
     data.forEach(transaction => {
-      expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
+      transaction.signatures
+        ? expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(multiSigTransactionPropertyArray))
+        : expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
     });
     expect(data.sort((a, b) => a.timestamp.unix < b.timestamp.unix)).toEqual(data);
   });
@@ -89,7 +118,9 @@ describe("Services > Transaction", () => {
     const { data } = await TransactionService.receivedByAddress("AUexKjGtgsSpVzPLs6jNMM6vJ6znEVTQWK");
     expect(data).toHaveLength(25);
     data.forEach(transaction => {
-      expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
+      transaction.signatures
+        ? expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(multiSigTransactionPropertyArray))
+        : expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
     });
     expect(data.sort((a, b) => a.timestamp.unix < b.timestamp.unix)).toEqual(data);
   });
@@ -98,7 +129,9 @@ describe("Services > Transaction", () => {
     const { data } = await TransactionService.receivedByAddress("AUexKjGtgsSpVzPLs6jNMM6vJ6znEVTQWK", 3, 40);
     expect(data).toHaveLength(40);
     data.forEach(transaction => {
-      expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
+      transaction.signatures
+        ? expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(multiSigTransactionPropertyArray))
+        : expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
     });
     expect(data.sort((a, b) => a.timestamp.unix < b.timestamp.unix)).toEqual(data);
   });
@@ -125,7 +158,9 @@ describe("Services > Transaction", () => {
     const { data } = await TransactionService.byBlock("8034780571166969612");
     expect(data).toHaveLength(1);
     data.forEach(transaction => {
-      expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
+      transaction.signatures
+        ? expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(multiSigTransactionPropertyArray))
+        : expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
     });
   });
 
@@ -142,4 +177,61 @@ describe("Services > Transaction", () => {
   it("should fail with a 404 statusCode when an incorrect block id is given", async () => {
     await expect(TransactionService.byBlock("0")).rejects.toThrow();
   });
+
+  it("should return all transactions with a fee exceeding 25 ARK", async () => {
+    const minAmount = 25 * 1e8;
+    jest.setTimeout(30000);
+    const { data } = await TransactionService.search({
+      fee: { from: minAmount },
+    });
+    data.forEach(transaction => {
+      transaction.signatures
+        ? expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(multiSigTransactionPropertyArray))
+        : expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
+      expect(parseInt(transaction.fee)).toBeGreaterThanOrEqual(minAmount);
+    });
+  });
+
+  it("should return all transactions with an amount between 5000 and 6000 ARK", async () => {
+    const minAmount = 5000 * 1e8;
+    const maxAmount = 6000 * 1e8;
+    jest.setTimeout(30000);
+    const { data } = await TransactionService.search({
+      amount: { from: minAmount, to: maxAmount },
+    });
+    expect(data).toHaveLength(25);
+    data.forEach(transaction => {
+      transaction.signatures
+        ? expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(multiSigTransactionPropertyArray))
+        : expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
+      expect(parseInt(transaction.amount)).toBeLessThanOrEqual(maxAmount);
+      expect(parseInt(transaction.amount)).toBeGreaterThanOrEqual(minAmount);
+    });
+  });
+
+  it("should return the latest transactions when no arguments are passed", async () => {
+    jest.setTimeout(30000);
+    const { data } = await TransactionService.search();
+    expect(data).toHaveLength(25);
+    data.forEach(transaction => {
+      transaction.signatures
+        ? expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(multiSigTransactionPropertyArray))
+        : expect(Object.keys(transaction).sort()).toEqual(expect.arrayContaining(transactionPropertyArray));
+    });
+  });
 });
+
+describe("Services > Transaction (2.6)", () => {
+  beforeAll(() => {
+    store.dispatch("network/setServer", "https://dexplorer.ark.io/api/v2");
+  });
+
+  it("should return all transactions that have 'test' in their smartbridge field", async () => {
+    jest.setTimeout(30000);
+    const { data } = await TransactionService.search({ vendorField: 'test' });
+    expect(data).toHaveLength(25);
+    data.forEach(transaction => {
+      expect(transaction.vendorField.includes('test')).toBe(true);
+    });
+  });
+}

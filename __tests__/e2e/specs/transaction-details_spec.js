@@ -35,6 +35,13 @@ describe("Transaction Details", () => {
       .and("include.text", "Wallet summary");
   });
 
+  it("should be possible to see the transaction type", () => {
+    cy.get(".page-section")
+      .find(".list-row-border-b")
+      .eq(2)
+      .should('include.text', 'Transfer');
+  });
+
   it("should be possible to click on the block id", () => {
     cy.get(".page-section")
       .find(".list-row")
@@ -50,14 +57,14 @@ describe("Transaction Details", () => {
   it("should emojify the vendor field", () => {
     cy.get(".page-section")
       .find(".list-row-border-b-no-wrap")
-      .last()
+      .eq(1)
       .should("include.text", "ARK ❤️ you");
   });
 
   it("should refresh the confirmation count automatically", () => {
     cy.get(".page-section")
       .find(".list-row-border-b")
-      .eq(2)
+      .eq(3)
       .find("div")
       .should("have.length", 2)
       .last()
@@ -66,7 +73,7 @@ describe("Transaction Details", () => {
     cy.get("@count").then($count => {
       const count = $count.text();
 
-      cy.get("@count", { timeout: 20000 }).should($count2 => {
+      cy.get("@count", { timeout: 30000 }).should($count2 => {
         expect($count2.text()).not.to.eq(count);
       });
     });
