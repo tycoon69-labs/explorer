@@ -1,47 +1,34 @@
 <template>
-  <span class="block md:inline-block">
-    <template v-if="!type">
-      <RouterLink v-if="isKnown" :to="{ name: 'wallet', params: { address: walletAddress } }" class="flex items-center">
-        <span
-          v-tooltip="{
-            content: getAddress(),
-            placement: tooltipPlacement,
-          }"
-        >
-          {{ knownWallets[address] }}
-        </span>
-        <SvgIcon
-          v-tooltip="{
-            content: $t('WALLET.VERIFIED'),
-            placement: tooltipPlacement,
-          }"
-          class="flex flex-none ml-2"
-          name="verified"
-          view-box="0 0 16 17"
+  <span class="flex items-center">
+    <template v-if="isTransfer(type, typeGroup) || isTimelock(type, typeGroup)">
+      <span v-if="showAsType">
+        {{ $t(`TRANSACTION.TYPES.${isTransfer(type, typeGroup) ? "TRANSFER" : "TIMELOCK"}`) }}
+      </span>
+      <div v-else class="flex items-center w-full">
+        <LinkAddress
+          :address="address"
+          :public-key="publicKey"
+          :trunc="trunc"
+          :tooltip-placement="tooltipPlacement"
+          container-class="w-full"
         />
-      </RouterLink>
-      <RouterLink
-        v-else
-        v-tooltip="{
-          content: getAddress(),
-          placement: tooltipPlacement,
-        }"
-        :to="{ name: 'wallet', params: { address: walletAddress } }"
-      >
-        <span v-if="hasDefaultSlot">
-          <slot />
-        </span>
-        <span v-else-if="delegate">{{ delegate.username }}</span>
-        <span v-else-if="address">
-          <span class="hidden md:inline-block">{{ trunc ? truncate(address) : address }}</span>
-          <span class="md:hidden">{{ truncate(address) }}</span>
-        </span>
-      </RouterLink>
+        <div v-if="isTimelock(type, typeGroup) && showTimelockIcon">
+          <SvgIcon
+            v-tooltip="{
+              content: $t('WALLET.TIMELOCK_TRANSACTION'),
+              placement: tooltipPlacement,
+            }"
+            class="ml-1"
+            name="became-active"
+            view-box="0 0 14 15"
+          />
+        </div>
+      </div>
     </template>
 
-    <span v-else-if="type === 1">{{ $t("TRANSACTION.TYPES.SECOND_SIGNATURE") }}</span>
-    <span v-else-if="type === 2">{{ $t("TRANSACTION.TYPES.DELEGATE_REGISTRATION") }}</span>
-    <span v-else-if="type === 3">
+    <span v-else-if="isSecondSignature(type, typeGroup)">{{ $t("TRANSACTION.TYPES.SECOND_SIGNATURE") }}</span>
+    <span v-else-if="isDelegateRegistration(type, typeGroup)">{{ $t("TRANSACTION.TYPES.DELEGATE_REGISTRATION") }}</span>
+    <span v-else-if="isVote(type, typeGroup)">
       <RouterLink
         v-if="votedDelegateAddress"
         v-tooltip="{
@@ -56,49 +43,64 @@
         >
       </RouterLink>
     </span>
-    <span v-else-if="type === 4">{{ $t("TRANSACTION.TYPES.MULTI_SIGNATURE") }}</span>
-    <span v-else-if="type === 5">{{ $t("TRANSACTION.TYPES.IPFS") }}</span>
-    <span v-else-if="type === 6">{{ $t("TRANSACTION.TYPES.TIMELOCK_TRANSFER") }}</span>
-    <span v-else-if="type === 7">{{ $t("TRANSACTION.TYPES.MULTI_PAYMENT") }}</span>
-    <span v-else-if="type === 8">{{ $t("TRANSACTION.TYPES.DELEGATE_RESIGNATION") }}</span>
+    <span v-else-if="isMultiSignature(type, typeGroup)">{{ $t("TRANSACTION.TYPES.MULTI_SIGNATURE") }}</span>
+    <span v-else-if="isIpfs(type, typeGroup)">{{ $t("TRANSACTION.TYPES.IPFS") }}</span>
+    <span v-else-if="isMultiPayment(type, typeGroup)"
+      >{{ $t("TRANSACTION.TYPES.MULTI_PAYMENT") }} ({{ multiPaymentRecipientsCount }})</span
+    >
+    <span v-else-if="isDelegateResignation(type, typeGroup)">{{ $t("TRANSACTION.TYPES.DELEGATE_RESIGNATION") }}</span>
+    <span v-else-if="isTimelockClaim(type, typeGroup)">{{ $t("TRANSACTION.TYPES.TIMELOCK_CLAIM") }}</span>
+    <span v-else-if="isTimelockRefund(type, typeGroup)">{{ $t("TRANSACTION.TYPES.TIMELOCK_REFUND") }}</span>
+    <span v-else-if="isBusinessRegistration(type, typeGroup)">{{ $t("TRANSACTION.TYPES.BUSINESS_REGISTRATION") }}</span>
+    <span v-else-if="isBusinessResignation(type, typeGroup)">{{ $t("TRANSACTION.TYPES.BUSINESS_RESIGNATION") }}</span>
+    <span v-else-if="isBusinessUpdate(type, typeGroup)">{{ $t("TRANSACTION.TYPES.BUSINESS_UPDATE") }}</span>
+    <span v-else-if="isBridgechainRegistration(type, typeGroup)">{{
+      $t("TRANSACTION.TYPES.BRIDGECHAIN_REGISTRATION")
+    }}</span>
+    <span v-else-if="isBridgechainResignation(type, typeGroup)">{{
+      $t("TRANSACTION.TYPES.BRIDGECHAIN_RESIGNATION")
+    }}</span>
+    <span v-else-if="isBridgechainUpdate(type, typeGroup)">{{ $t("TRANSACTION.TYPES.BRIDGECHAIN_UPDATE") }}</span>
+    <!-- By default we simply link to a recipient as we don't know this type / typegroup combination -->
+    <div v-else>
+      <span v-if="showAsType">{{ $t("TRANSACTION.TYPES.UNKNOWN") }}</span>
+      <LinkAddress
+        v-else
+        :address="address"
+        :public-key="publicKey"
+        :trunc="trunc"
+        :tooltip-placement="tooltipPlacement"
+      />
+    </div>
   </span>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { mapGetters } from "vuex";
-import { IDelegate } from "../../interfaces";
+import { IDelegate } from "@/interfaces";
+import LinkAddress from "./LinkAddress.vue";
 
 @Component({
+  components: {
+    LinkAddress,
+  },
   computed: {
     ...mapGetters("delegates", ["delegates"]),
-    ...mapGetters("network", ["knownWallets"]),
   },
 })
 export default class LinkWallet extends Vue {
   @Prop({ required: false, default: "" }) public address: string;
-  @Prop({ required: false, default: null }) public asset: { votes: [string] } | null;
+  @Prop({ required: false, default: null }) public asset: { [key: string]: [any] } | null;
   @Prop({ required: false, default: "" }) public publicKey: string;
   @Prop({ required: false, default: 0 }) public type: number;
+  @Prop({ required: false, default: 1 }) public typeGroup: number;
   @Prop({ required: false, default: true }) public trunc: boolean;
   @Prop({ required: false, default: "top" }) public tooltipPlacement: string;
+  @Prop({ required: false, default: false }) public showTimelockIcon: boolean;
+  @Prop({ required: false, default: false }) public showAsType: boolean;
 
-  private delegate: IDelegate | null | undefined = null;
-  private votedDelegate: IDelegate | null | undefined = null;
-  private delegates: [IDelegate];
-  private knownWallets: { [key: string]: string };
-
-  get isKnown(): string {
-    return this.knownWallets[this.address];
-  }
-
-  get walletAddress(): string {
-    return this.delegate ? this.delegate.address : this.address;
-  }
-
-  get hasDefaultSlot(): boolean {
-    return !!this.$slots.default;
-  }
+  private delegates: IDelegate[];
 
   get getVoteColor(): string {
     return this.isUnvote ? "text-red" : "text-green";
@@ -120,6 +122,10 @@ export default class LinkWallet extends Vue {
     return "";
   }
 
+  get votedDelegate(): IDelegate | null {
+    return this.votePublicKey ? this.delegates.find((d) => d.publicKey === this.votePublicKey) : null;
+  }
+
   get votedDelegateAddress(): string {
     return this.votedDelegate ? this.votedDelegate.address : "";
   }
@@ -128,53 +134,11 @@ export default class LinkWallet extends Vue {
     return this.votedDelegate ? this.votedDelegate.username : "";
   }
 
-  @Watch("delegates")
-  public onDelegateChanged() {
-    this.determine();
-  }
-
-  @Watch("address")
-  public onAddressChanged() {
-    this.determine();
-  }
-
-  @Watch("publicKey")
-  public onPublicKeyChanged() {
-    this.determine();
-  }
-
-  public mounted(): void {
-    this.determine();
-  }
-
-  private determine(): void {
-    this.address ? this.findByAddress() : this.findByPublicKey();
-    if (this.votePublicKey) {
-      this.determineVote();
+  get multiPaymentRecipientsCount(): number {
+    if (this.asset && this.asset.payments) {
+      return this.asset.payments.length;
     }
-  }
-
-  private determineVote(): void {
-    this.votedDelegate = this.delegates.find(d => d.publicKey === this.votePublicKey);
-  }
-
-  private findByAddress(): void {
-    this.delegate = this.delegates.find(d => d.address === this.address);
-  }
-
-  private findByPublicKey(): void {
-    this.delegate = this.delegates.find(d => d.publicKey === this.publicKey);
-  }
-
-  private getAddress(): string | false {
-    const knownOrDelegate = this.isKnown || this.delegate;
-    const truncated = !this.hasDefaultSlot && this.trunc;
-
-    if (knownOrDelegate || truncated) {
-      return this.walletAddress;
-    }
-
-    return false;
+    return 0;
   }
 }
 </script>

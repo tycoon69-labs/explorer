@@ -4,9 +4,7 @@
       v-if="hasError || isLoading"
       class="absolute inset-0 flex flex-col items-center justify-center text-white z-10"
     >
-      <p v-if="hasError" class="mb-4">
-        {{ $t("MARKET_CHART.ERROR") }}
-      </p>
+      <p v-if="hasError" class="mb-4">{{ $t("MARKET_CHART.ERROR") }}</p>
       <button :disabled="isLoading" class="mt-4 pager-button items-center" @click="renderChart(1000)">
         <span v-if="!isLoading">{{ $t("MARKET_CHART.RELOAD") }}</span>
         <Loader v-else :data="null" />
@@ -30,9 +28,9 @@
             class="absolute left-0 mt-px bg-theme-content-background shadow-theme rounded border overflow-hidden text-sm"
           >
             <li v-for="type in ['price', 'volume']" :key="type">
-              <span class="dropdown-button" @click="setType(type)">
-                {{ currencyName }} {{ $t(`MARKET_CHART.${type.toUpperCase()}`) }}
-              </span>
+              <span class="dropdown-button" @click="setType(type)"
+                >{{ currencyName }} {{ $t(`MARKET_CHART.${type.toUpperCase()}`) }}</span
+              >
             </li>
           </ul>
         </div>
@@ -74,9 +72,9 @@ import PriceChart from "@/components/charts/price-chart";
 })
 export default class ChartWrapper extends Vue {
   private error: string | null = null;
-  private isLoading: boolean = false;
-  private isOpen: boolean = false;
-  private componentKey: number = 0;
+  private isLoading = false;
+  private isOpen = false;
+  private componentKey = 0;
   private labels: string[] = [];
   private datasets: any[] = [];
   private options: object = {
@@ -117,8 +115,11 @@ export default class ChartWrapper extends Vue {
             fontColor: "#838a9b",
             fontSize: 13,
           },
+          position: "right",
           gridLines: {
+            display: true,
             color: "#282b38",
+            zeroLineColor: "#282b38",
           },
         },
       ],
@@ -127,10 +128,21 @@ export default class ChartWrapper extends Vue {
           gridLines: {
             display: true,
             color: "#282b38",
+            zeroLineColor: "#282b38",
           },
           ticks: {
             fontColor: "#838a9b",
             fontSize: 13,
+            callback(value, index, values) {
+              if (
+                ((values.length > 10 && index % 2 !== 0) || (values.length > 360 && index % 3 !== 0)) &&
+                index !== 364
+              ) {
+                return;
+              } else {
+                return value;
+              }
+            },
           },
         },
       ],
@@ -139,7 +151,7 @@ export default class ChartWrapper extends Vue {
       backgroundColor: "#272936",
       titleFontStyle: "normal",
       titleFontSize: 18,
-      titleFontFamily: "'Proxima Nova Regular', sans-serif",
+      titleFontFamily: "'Inter Regular', sans-serif",
       titleMarginBottom: 0,
       cornerRadius: 3,
       bodyFontColor: "#838a9b",
@@ -154,7 +166,7 @@ export default class ChartWrapper extends Vue {
       // borderColor: '#037cff',
       callbacks: {
         // @ts-ignore
-        title: tooltipItem => this.readableCurrency(tooltipItem[0].yLabel, 1, null, false),
+        title: (tooltipItem) => this.readableCurrency(tooltipItem[0].yLabel, 1, null, false),
         label: (tooltipItem: any) => "",
       },
     },
@@ -237,7 +249,7 @@ export default class ChartWrapper extends Vue {
     this.$store.dispatch("ui/setPriceChartOption", { option: "type", value: type });
   }
 
-  private async renderChart(delay: number = 0) {
+  private async renderChart(delay = 0) {
     if (!this.datasets.length) {
       this.isLoading = true;
     }

@@ -1,6 +1,6 @@
 {
   "title": "tycoon Devnet Explorer",
-  "server": "http://dexplorer.tycoonchain.com/api",
+  "server": "http://explorer.tycoonchain.com/api",
   "alias": "Development",
   "activeDelegates": "53",
   "rewardOffset": "1",

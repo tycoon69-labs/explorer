@@ -6,18 +6,18 @@
         {{ $t("FOOTER.ALL_RIGHTS_RESERVED") }}</span
       >
       <div class="block md:inline-block">
-        <span class="hidden md:inline-block">&nbsp;|&nbsp;</span>
+        <span class="hidden md:inline-block px-1">|</span>
         <span
           >{{ $t("FOOTER.VERSION") }}: <a :href="versionLink" target="_blank">{{ version }}</a> |
           {{ $t("FOOTER.DATE") }}: {{ date }}</span
         >
       </div>
     </div>
-    <!--<div class="text-center">
+    <!-- <div class="text-center">
       <a v-for="social in socialMediaData" :key="social.name" :href="social.url" target="_blank">
         <SvgIcon class="m-1" :name="`social/${social.name}`" :view-box="social.viewBox" />
       </a>
-    </div>-->
+    </div> -->
   </footer>
 </template>
 
