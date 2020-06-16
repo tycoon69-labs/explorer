@@ -38,7 +38,7 @@
 
         <div v-else-if="data.column.field === 'vendorField'">
           <div class="cell-smartbridge-truncate">
-            {{ emojify(data.row.vendorField) }}
+            {{ data.row.vendorField }}
           </div>
         </div>
 
@@ -57,7 +57,7 @@
               class="flex items-center justify-end whitespace-no-wrap text-green"
             >
               <span class="inline-block mr-2">{{ readableNumber(data.row.confirmations) }}</span>
-              <SvgIcon class="icon flex-none" name="became-active" view-box="0 0 16 16" />
+              <SvgIcon class="flex-none icon" name="became-active" view-box="0 0 16 16" />
             </div>
             <div v-else>
               <div v-tooltip="readableNumber(data.row.confirmations) + ' ' + $t('COMMON.CONFIRMATIONS')">
@@ -81,6 +81,7 @@ import CryptoCompareService from "@/services/crypto-compare";
   computed: {
     ...mapGetters("network", ["activeDelegates", "isListed"]),
     ...mapGetters("currency", { currencySymbol: "symbol" }),
+    ...mapGetters("ui", ["smartbridgeFilter"]),
   },
 })
 export default class TableTransactionsDesktop extends Vue {
@@ -96,6 +97,7 @@ export default class TableTransactionsDesktop extends Vue {
   private activeDelegates: IDelegate[];
   private isListed: boolean;
   private currencySymbol: string;
+  private smartbridgeFilter: string;
 
   get columns() {
     const feeClasses = ["hidden", "lg:table-cell"];
@@ -131,6 +133,7 @@ export default class TableTransactionsDesktop extends Vue {
         field: "vendorField",
         thClass: "text-right cell-smartbridge",
         tdClass: "text-right cell-smartbridge",
+        hidden: this.smartbridgeFilter === "hidden",
       },
       {
         label: this.$t("TRANSACTION.AMOUNT"),
@@ -166,6 +169,10 @@ export default class TableTransactionsDesktop extends Vue {
   }
 
   get showSmartBridgeIcon() {
+    if (this.smartbridgeFilter === "hidden") {
+      return false;
+    }
+
     return this.transactions!.some((transaction) => {
       return !!transaction.vendorField;
     });

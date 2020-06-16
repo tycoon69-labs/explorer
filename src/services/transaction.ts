@@ -1,6 +1,28 @@
+import store from "@/store";
 import ApiService from "@/services/api";
 import { IApiTransactionWrapper, IApiTransactionsWrapper, ITransaction, ITransactionSearchParams } from "../interfaces";
 import { paginationLimit } from "@/constants";
+import { Sanitizer } from "@/utils/Sanitizer";
+import emoji from "node-emoji";
+
+const sanitizeVendorField = (transaction: ITransaction) => {
+  if (transaction.vendorField) {
+    const sanitizer = new Sanitizer();
+    const smartbridgeFilter = store.getters["ui/smartbridgeFilter"];
+
+    if (smartbridgeFilter === "unfiltered") {
+      transaction.vendorField = emoji.emojify(transaction.vendorField);
+    } else {
+      if (sanitizer.isBad(transaction.vendorField)) {
+        delete transaction.vendorField;
+      } else {
+        transaction.vendorField = sanitizer.apply(emoji.emojify(transaction.vendorField));
+      }
+    }
+  }
+
+  return transaction;
+};
 
 class TransactionService {
   public async latest(limit: number = paginationLimit): Promise<ITransaction[]> {
@@ -11,11 +33,16 @@ class TransactionService {
       },
     })) as IApiTransactionsWrapper;
 
+    response.data.map(sanitizeVendorField);
+
     return response.data;
   }
 
   public async find(id: string): Promise<ITransaction> {
     const response = (await ApiService.get(`transactions/${id}`)) as IApiTransactionWrapper;
+
+    sanitizeVendorField(response.data);
+
     return response.data;
   }
 
@@ -43,6 +70,8 @@ class TransactionService {
       params,
     })) as IApiTransactionsWrapper;
 
+    response.data.map(sanitizeVendorField);
+
     return response;
   }
 
@@ -58,6 +87,8 @@ class TransactionService {
       },
     })) as IApiTransactionsWrapper;
 
+    response.data.map(sanitizeVendorField);
+
     return response;
   }
 
@@ -70,6 +101,8 @@ class TransactionService {
       },
     })) as IApiTransactionsWrapper;
 
+    response.data.map(sanitizeVendorField);
+
     return response;
   }
 
@@ -81,6 +114,8 @@ class TransactionService {
         limit,
       },
     })) as IApiTransactionsWrapper;
+
+    response.data.map(sanitizeVendorField);
 
     return response;
   }
@@ -98,6 +133,8 @@ class TransactionService {
       },
     })) as IApiTransactionsWrapper;
 
+    response.data.map(sanitizeVendorField);
+
     return response;
   }
 
@@ -113,6 +150,8 @@ class TransactionService {
         limit,
       },
     })) as IApiTransactionsWrapper;
+
+    response.data.map(sanitizeVendorField);
 
     return response;
   }
@@ -130,6 +169,8 @@ class TransactionService {
       },
     })) as IApiTransactionsWrapper;
 
+    response.data.map(sanitizeVendorField);
+
     return response;
   }
 
@@ -141,6 +182,8 @@ class TransactionService {
     const response = (await ApiService.post(`locks/unlocked`, {
       ids: transactionIds,
     })) as IApiTransactionsWrapper;
+
+    response.data.map(sanitizeVendorField);
 
     return response;
   }

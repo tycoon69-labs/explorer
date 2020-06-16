@@ -1,4 +1,33 @@
 module.exports = {
+  purge: {
+    enabled: process.env.NODE_ENV === "production",
+    content: ["./public/index.html", "./src/**/*.vue", "./src/**/*.js", "./src/**/*.ts"],
+    defaultExtractor: (content) => {
+      const broadMatches = content.match(/[^<>"'`\s]*[^<>"'`\s:]/g) || [];
+      const innerMatches = content.match(/[^<>"'`\s.()]*[^<>"'`\s.():]/g) || [];
+
+      return broadMatches.concat(innerMatches);
+    },
+    options: {
+      whitelist: [
+        "html",
+        "body",
+        "border-theme-page-background",
+        "table-component__th--sort-asc",
+        "table-component__th--sort-desc",
+        "tooltip",
+        "tooltip-inner",
+        "tooltip-arrow",
+        "tr",
+        "td",
+        "th",
+        "v-spinner",
+        "text-status-became-active",
+      ],
+      whitelistPatterns: [/^tooltip-bg-/, /^vgt-/],
+      whitelistPatternsChildren: [/^vgt-/],
+    },
+  },
   theme: {
     screens: {
       sm: "576px",
@@ -7,9 +36,9 @@ module.exports = {
       xl: "1200px",
     },
 
-    backgroundColor: theme => theme("colors"),
+    backgroundColor: (theme) => theme("colors"),
 
-    borderColor: theme => ({
+    borderColor: (theme) => ({
       default: theme("colors.theme-border"),
       ...theme("colors"),
     }),
@@ -58,19 +87,20 @@ module.exports = {
       "theme-nav-border": "var(--nav-border)",
       "stat-background": "var(--stat-background)",
       "theme-text-tertiary": "var(--theme-text-tertiary)",
-      "chart-active": "var(--chart-active)",
-      "chart-inactive": "var(--chart-inactive)",
       "theme-button": "var(--theme-button)",
       "theme-button-active": "var(--theme-button-active)",
       "theme-button-text": "var(--theme-button-text)",
       "theme-button-close": "var(--theme-button-close)",
-      "language-icon": "var(--language-icon)",
+      "theme-switch-button": "var(--theme-switch-button)",
+      "theme-switch-button-circle": "var(--theme-switch-button-circle)",
+      "settings-icon": "var(--settings-icon)",
       "theme-accents": "var(--color-theme-accents)",
       "theme-transaction-icon": "var(--color-theme-transaction-icon)",
       "theme-resigned-label": "var(--theme-resigned-label)",
       "theme-input-field-border": "var(--theme-input-field-border)",
       "theme-input-field-border-focus": "var(--theme-input-field-border-focus)",
       "theme-input-field-border-hover": "var(--theme-input-field-border-hover)",
+      "theme-line-separator": "var(--theme-line-separator)",
 
       "theme-text-thead": "var(--color-theme-text-thead)",
 
@@ -337,7 +367,7 @@ module.exports = {
       current: "currentColor",
     },
 
-    textColor: theme => theme("colors"),
+    textColor: (theme) => theme("colors"),
 
     width: {
       auto: "auto",

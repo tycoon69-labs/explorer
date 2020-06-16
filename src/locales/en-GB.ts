@@ -24,6 +24,11 @@ export default {
     WALLET: "Wallet",
     ACCEPT: "Accept",
     CANCEL: "Cancel",
+    SAVE: "Save",
+    UNFILTERED: "Unfiltered",
+    FILTERED: "Filtered",
+    HIDDEN: "Hidden",
+    I_AGREE: "I Agree",
   },
 
   DISCLAIMER: {
@@ -31,6 +36,8 @@ export default {
     TEXT1:
       "The following page is a directory for informational purposes only. {website} is in no way affiliated with the listed individuals and/or business and bridgechain entities listed herein. All links provided herein are third party websites that have not been verified and are owned by independent parties over which {website} has no control. {website} does not endorse or approve and makes no warranties, representations or undertakings relating to the content of third party websites.",
     TEXT2: "By clicking “Accept” you will be confirming that you have read and are in agreement with all terms herein.",
+    TEXT3:
+      "I agree by choosing to display the vendorfield, you accept that text from third parties outside of {website}'s control may post text that cannot be censored, removed, or manipulated. {website} assumes no responsibility for the content and/or nature of the text displayed and the harm and/or liability that may arise over accessing such text.",
   },
 
   MARKET_CHART: {
@@ -139,10 +146,15 @@ export default {
     BALANCE: "Balance ({token})",
     LOCKED_BALANCE: "Locked Balance",
     SECOND_PASSPHRASE_ENABLED: "Second signature enabled",
-    MULTI_SIGNATURE_WALLET: "Multi signature wallet",
+    MULTI_SIGNATURE_WALLET: "Multisignature wallet",
     SUMMARY: "Wallet summary",
     QR_CODE: "QR Code",
     SCAN_FOR_ADDRESS: "Scan for address",
+    SCAN_FOR_URI: "Scan for URI",
+    ADVANCED_QR: {
+      EXPAND: "Show options",
+      COLLAPSE: "Hide options",
+    },
     DELEGATE: {
       FORGED_BLOCKS: "Minted blocks",
       TOTAL_FORGED: "Total minted",
@@ -190,6 +202,7 @@ export default {
       CREATOR: "Creator",
       SEED_SERVER: "Seed Server",
       REPOSITORY: "Repository",
+      RESIGNED: "Resigned",
     },
     BUSINESSES: {
       TITLE: "Businesses",
@@ -197,6 +210,7 @@ export default {
       CREATOR: "Creator",
       WEBSITE: "Website",
       REPOSITORY: "Repository",
+      RESIGNED: "Resigned",
     },
     DELEGATES: {
       TITLE: "Leaders",
@@ -293,6 +307,16 @@ export default {
     SUPPLY: "Supply",
     MARKET_CAP: "Market Cap",
     TESTNET_LOCAL: "Testnet Local",
+  },
+
+  MODAL_SETTINGS: {
+    TITLE: "Explorer Settings",
+    DESCRIPTION: "Customize the Explorer to suit your needs",
+    CURRENCY: "Currency",
+    SMARTBRIDGE_FILTER: "Smartbridge Filter",
+    DARK_THEME: "Dark Theme",
+    PRICE_CHART: "Price Chart",
+    LANGUAGE: "Language",
   },
 
   FOOTER: {
