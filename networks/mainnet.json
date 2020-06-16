@@ -5,7 +5,6 @@
   "activeDelegates": "53",
   "rewardOffset": "1",
   "currencies": [],
-  "knownWallets": {},
   "defaults": {
     "token": "T69",
     "symbol": "T69",
@@ -16,5 +15,6 @@
       "type": "price"
     },
     "priceChart": false
-  }
+  },
+  "knownWallets": {}
 }

@@ -1,5 +1,5 @@
 import store from "@/store";
-import emoji from "node-emoji";
+import { Sanitizer } from "@/utils/Sanitizer";
 
 const locale = store.getters["ui/locale"];
 
@@ -39,10 +39,6 @@ export default {
       }
 
       return "-";
-    },
-
-    emojify(text: string): string {
-      return emoji.emojify(text);
     },
   },
 };

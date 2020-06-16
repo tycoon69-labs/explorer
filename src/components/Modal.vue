@@ -4,6 +4,7 @@
       <div class="modal-mask" @click="emitOutsideClick()">
         <div class="flex items-center justify-center absolute inset-0">
           <div
+            :class="containerClasses"
             class="modal-container bg-theme-page-background text-theme-text-content rounded shadow-theme mx-4 sm:mx-auto relative p-6 sm:p-10"
             @click.stop
           >
@@ -28,11 +29,26 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 
 @Component
 export default class Modal extends Vue {
+  @Prop({ required: false }) public containerClasses: string;
   @Prop({ required: false, default: true }) public closeOutside: boolean;
   @Prop({ required: false, default: true }) public showCancel: boolean;
 
+  public mounted() {
+    document.addEventListener("keyup", this.onEscKey, false);
+  }
+
+  public destroyed() {
+    document.removeEventListener("keyup", this.onEscKey);
+  }
+
   private emitOutsideClick() {
     if (this.closeOutside) {
+      this.$emit("close");
+    }
+  }
+
+  private onEscKey(event: any) {
+    if (event.keyCode === 27 || event.key === "Escape") {
       this.$emit("close");
     }
   }

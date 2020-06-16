@@ -80,7 +80,7 @@
 
         <div v-if="transaction.vendorField" class="list-row-border-b-no-wrap">
           <div class="mr-4">{{ $t("TRANSACTION.SMARTBRIDGE") }}</div>
-          <div class="overflow-hidden break-words">{{ emojify(transaction.vendorField) }}</div>
+          <div class="overflow-hidden break-words">{{ transaction.vendorField }}</div>
         </div>
 
         <div v-if="transaction.nonce" class="list-row-border-b-no-wrap">
@@ -173,7 +173,7 @@
         <div class="list-row-border-b-no-wrap">
           <div class="mr-4">{{ $t("TRANSACTION.MULTI_SIGNATURE.PARTICIPANTS") }}</div>
           <ul>
-            <li v-for="publicKey in publicKeysFromMultiSignatureAsset" :key="publicKey" class="mb-1">
+            <li v-for="publicKey in publicKeysFromMultiSignatureAsset" :key="publicKey" class="mb-1 text-right">
               <LinkWallet
                 :address="addressFromPublicKey(publicKey)"
                 :trunc="false"
@@ -204,7 +204,7 @@
     <section
       v-if="
         transaction.typeGroup === typeGroupTransaction.MAGISTRATE &&
-          transaction.type !== magistrateTransaction.BUSINESS_RESIGNATION
+        transaction.type !== magistrateTransaction.BUSINESS_RESIGNATION
       "
       class="page-section py-5 md:py-10 mb-5"
     >
