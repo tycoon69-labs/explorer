@@ -53,7 +53,6 @@ class CryptoCompareService {
     //   return Number(response.data[currency]);
     // }
 
-    // console.log(currency)
     const response = await this.get("http://45.76.206.226:3000/price/latest?symbol=t69");
 
     if (response.data["USD"]) {
