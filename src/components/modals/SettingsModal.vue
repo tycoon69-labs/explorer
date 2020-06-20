@@ -12,7 +12,7 @@
 
       <div :class="{ 'SettingsModal__content__disclaimer--show': showDisclaimer }" class="SettingsModal__content p-0">
         <ListDivided>
-          <ListDividedItem v-if="showCurrency" :label="$t('MODAL_SETTINGS.CURRENCY')">
+          <!-- <ListDividedItem v-if="showCurrency" :label="$t('MODAL_SETTINGS.CURRENCY')">
             <InputSelect
               :select-options="selectCurrencies"
               :value="currencyName"
@@ -20,7 +20,7 @@
               class="SettingsModal__inputSelect SettingsModal__select__currency"
               @input="onSelectChange"
             />
-          </ListDividedItem>
+          </ListDividedItem> -->
           <ListDividedItem :label="$t('MODAL_SETTINGS.SMARTBRIDGE_FILTER')">
             <InputSelect
               :select-options="selectSmartbridgeFilter"
