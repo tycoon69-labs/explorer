@@ -53,10 +53,11 @@ class CryptoCompareService {
     //   return Number(response.data[currency]);
     // }
 
-    const response = await this.get("https://emirex.com/api/v1/ticker?filter=t69");
+    // console.log(currency)
+    const response = await this.get("http://45.76.206.226:3000/price/latest?symbol=t69");
 
-    if (response.data[`T69${currency}`]) {
-      return Number(response.data[`T69${currency}`].last);
+    if (response.data["USD"]) {
+      return Number(response.data["USD"].price);
     }
   }
 
@@ -88,7 +89,7 @@ class CryptoCompareService {
     const date = Math.round(new Date().getTime() / 1000);
     const token = store.getters["network/token"];
 
-    let targetCurrency = "USDT";
+    let targetCurrency = "USD";
     if (store.getters["currency/name"] !== token) {
       targetCurrency = store.getters["currency/name"];
     }

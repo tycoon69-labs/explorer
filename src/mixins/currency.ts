@@ -37,10 +37,9 @@ export default {
 
       const cryptos: { [key: string]: string } = {
         T69: "T69",
-        USDT: "$",
       };
 
-      return [store.getters["network/token"], "USDT"].some((c) => currencyName.indexOf(c) > -1)
+      return [store.getters["network/token"]].some((c) => currencyName.indexOf(c) > -1)
         ? `${Number(bigNumberValue).toLocaleString(locale, {
             maximumFractionDigits: 8,
           })} ${cryptos[currencyName]}`
@@ -51,7 +50,7 @@ export default {
     },
 
     rawCurrency(value: number, currencyName: string): string {
-      return [store.getters["network/token"], "USDT"].some((c) => currencyName.indexOf(c) > -1)
+      return [store.getters["network/token"]].some((c) => currencyName.indexOf(c) > -1)
         ? value.toLocaleString(locale, {
             maximumFractionDigits: 8,
           })
